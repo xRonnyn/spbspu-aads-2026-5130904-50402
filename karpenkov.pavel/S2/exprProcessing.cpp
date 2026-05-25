@@ -3,12 +3,14 @@
 #include "stack.hpp"
 #include <cctype>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 
 bool isNumber(const std::string &element) { return std::isdigit(element[0]); }
 
 bool isValidOperator(const std::string &element) {
-  if (element == "+" || element == "-" || element == "*" || element == "/") {
+  if (element == "+" || element == "-" || element == "*" || element == "/" ||
+      element == "%") {
     return true;
   }
   return false;
@@ -16,7 +18,7 @@ bool isValidOperator(const std::string &element) {
 size_t priority(const std::string &operation) {
   if (operation == "+" || operation == "-") {
     return 1;
-  } else if (operation == "/" || operation == "*") {
+  } else if (operation == "/" || operation == "*" || operation == "%") {
     return 2;
   }
   return 0;
@@ -91,8 +93,20 @@ karpenkov::Stack<queueExpr> inputCLI(std::istream &in) {
 }
 long long eval(long long a, long long b, const std::string &operation) {
   if (operation == "+") {
+    if (b > 0 && a > std::numeric_limits<long long>::max() - b) {
+      throw std::overflow_error("overflow");
+    }
+    if (b < 0 && a < std::numeric_limits<long long>::min() - b) {
+      throw std::overflow_error("underflow");
+    }
     return a + b;
   } else if (operation == "-") {
+    if (b < 0 && a > std::numeric_limits<long long>::max() + b) {
+      throw std::overflow_error("overflow");
+    }
+    if (b > 0 && a < std::numeric_limits<long long>::min() + b) {
+      throw std::overflow_error("underflow");
+    }
     return a - b;
   } else if (operation == "*") {
     return a * b;
@@ -101,6 +115,11 @@ long long eval(long long a, long long b, const std::string &operation) {
       throw std::runtime_error("divide by 0");
     }
     return a / b;
+  } else if (operation == "%") {
+    if (b == 0) {
+      throw std::runtime_error("divide by 0");
+    }
+    return a % b;
   }
   throw std::runtime_error("unkown operation");
 }
@@ -122,12 +141,12 @@ calculateExpr(karpenkov::Stack<queueExpr> &postfixExpr) {
         if (calculateStack.empty()) {
           throw std::runtime_error("Not enough operands");
         }
-        int b = calculateStack.top();
+        long long b = calculateStack.top();
         calculateStack.pop();
         if (calculateStack.empty()) {
           throw std::runtime_error("Not enough operands");
         }
-        int a = calculateStack.top();
+        long long a = calculateStack.top();
         calculateStack.pop();
         calculateStack.push(eval(a, b, element));
       }
@@ -143,6 +162,7 @@ void queueOutput(std::ostream &out, karpenkov::Stack<long long> result) {
   while (!result.empty()) {
     if (isFirst) {
       out << result.top();
+      isFirst = false;
     } else {
       out << ' ' << result.top();
     }
