@@ -17,7 +17,7 @@ karpenkov::Stack<queueExpr> toPostfix(karpenkov::Stack<queueExpr> expressions);
 karpenkov::Stack<long long>
 calculateExpr(karpenkov::Stack<queueExpr> &postfixExpr);
 
-void queueOutput(std::ostream &out, karpenkov::Stack<int> result);
+void queueOutput(std::ostream &out, karpenkov::Stack<long long> result);
 
 long long eval(long long a, long long b, const std::string &operation);
 

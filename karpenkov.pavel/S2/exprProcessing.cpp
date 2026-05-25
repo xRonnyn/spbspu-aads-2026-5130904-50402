@@ -106,7 +106,7 @@ long long eval(long long a, long long b, const std::string &operation) {
 }
 karpenkov::Stack<long long>
 calculateExpr(karpenkov::Stack<queueExpr> &postfixExpr) {
-  karpenkov::Stack<int> res;
+  karpenkov::Stack<long long> res;
   while (!postfixExpr.empty()) {
     queueExpr curExpr = postfixExpr.top();
     karpenkov::Stack<long long> calculateStack;
