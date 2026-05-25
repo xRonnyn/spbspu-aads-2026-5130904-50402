@@ -130,7 +130,12 @@ long long eval(long long a, long long b, const std::string &operation) {
     if (b == 0) {
       throw std::runtime_error("divide by 0");
     }
-    return a % b;
+    long long result = a % b;
+    if (result < 0) {
+      result += std::abs(b);
+    }
+
+    return result;
   }
   throw std::runtime_error("unkown operation");
 }
