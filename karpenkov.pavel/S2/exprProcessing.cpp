@@ -1,24 +1,19 @@
+#include "exprProcessing.hpp"
+#include "queue.hpp"
+#include "stack.hpp"
 #include <cctype>
 #include <iostream>
 #include <stdexcept>
-#include "queue.hpp"
-#include "stack.hpp"
-#include "exprProcessing.hpp"
 
-bool isNumber(const std::string &element)
-{
-  return std::isdigit(element[0]);
-}
+bool isNumber(const std::string &element) { return std::isdigit(element[0]); }
 
-bool isValidOperator(const std::string &element)
-{
+bool isValidOperator(const std::string &element) {
   if (element == "+" || element == "-" || element == "*" || element == "/") {
     return true;
   }
   return false;
 }
-size_t priority(const std::string &operation)
-{
+size_t priority(const std::string &operation) {
   if (operation == "+" || operation == "-") {
     return 1;
   } else if (operation == "/" || operation == "*") {
@@ -27,13 +22,12 @@ size_t priority(const std::string &operation)
   return 0;
 }
 
-karpenkov::Stack< queueExpr > toPostfix(karpenkov::Stack< queueExpr > expressions)
-{
-  karpenkov::Stack< queueExpr > postFix;
+karpenkov::Stack<queueExpr> toPostfix(karpenkov::Stack<queueExpr> expressions) {
+  karpenkov::Stack<queueExpr> postFix;
   while (!expressions.empty()) {
-    karpenkov::Queue< std::string > resultExpr;
-    karpenkov::Stack< std::string > tempStep;
-    karpenkov::Queue< std::string > curExpr = expressions.top();
+    karpenkov::Queue<std::string> resultExpr;
+    karpenkov::Stack<std::string> tempStep;
+    karpenkov::Queue<std::string> curExpr = expressions.top();
     while (!curExpr.empty()) {
       std::string element = curExpr.front();
       if (element == "(") {
@@ -53,7 +47,8 @@ karpenkov::Stack< queueExpr > toPostfix(karpenkov::Stack< queueExpr > expression
       }
 
       else if (isValidOperator(element)) {
-        while (!tempStep.empty() && tempStep.top() != "(" && priority(tempStep.top()) >= priority(element)) {
+        while (!tempStep.empty() && tempStep.top() != "(" &&
+               priority(tempStep.top()) >= priority(element)) {
           resultExpr.push(tempStep.top());
           tempStep.pop();
         }
@@ -71,13 +66,12 @@ karpenkov::Stack< queueExpr > toPostfix(karpenkov::Stack< queueExpr > expression
   return postFix;
 }
 
-karpenkov::Stack< queueExpr > inputCLI(std::istream &in)
-{
-  karpenkov::Stack< queueExpr > exprs;
+karpenkov::Stack<queueExpr> inputCLI(std::istream &in) {
+  karpenkov::Stack<queueExpr> exprs;
   std::string line;
   while (std::getline(in, line)) {
     if (!line.empty()) {
-      karpenkov::Queue< std::string > curExpr;
+      karpenkov::Queue<std::string> curExpr;
       std::string element;
       for (char a : line) {
         if (a != ' ') {
@@ -95,8 +89,7 @@ karpenkov::Stack< queueExpr > inputCLI(std::istream &in)
   }
   return exprs;
 }
-int eval(int a, int b, const std::string &operation)
-{
+long long eval(long long a, long long b, const std::string &operation) {
   if (operation == "+") {
     return a + b;
   } else if (operation == "-") {
@@ -111,17 +104,17 @@ int eval(int a, int b, const std::string &operation)
   }
   throw std::runtime_error("unkown operation");
 }
-karpenkov::Stack< int > calculateExpr(karpenkov::Stack< queueExpr > &postfixExpr)
-{
-  karpenkov::Stack< int > res;
+karpenkov::Stack<long long>
+calculateExpr(karpenkov::Stack<queueExpr> &postfixExpr) {
+  karpenkov::Stack<int> res;
   while (!postfixExpr.empty()) {
     queueExpr curExpr = postfixExpr.top();
-    karpenkov::Stack< int > calculateStack;
+    karpenkov::Stack<long long> calculateStack;
     while (!curExpr.empty()) {
       std::string element = curExpr.front();
       if (isNumber(element)) {
         try {
-          calculateStack.push(std::stoi(element));
+          calculateStack.push(std::stoll(element));
         } catch (...) {
           throw std::runtime_error("element is not a number: " + element);
         }
@@ -145,8 +138,7 @@ karpenkov::Stack< int > calculateExpr(karpenkov::Stack< queueExpr > &postfixExpr
   }
   return res;
 }
-void queueOutput(std::ostream &out, karpenkov::Stack< int > result)
-{
+void queueOutput(std::ostream &out, karpenkov::Stack<int> result) {
   bool isFirst = true;
   while (!result.empty()) {
     if (isFirst) {
