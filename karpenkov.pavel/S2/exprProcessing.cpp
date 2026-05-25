@@ -138,7 +138,7 @@ calculateExpr(karpenkov::Stack<queueExpr> &postfixExpr) {
   }
   return res;
 }
-void queueOutput(std::ostream &out, karpenkov::Stack<int> result) {
+void queueOutput(std::ostream &out, karpenkov::Stack<long long> result) {
   bool isFirst = true;
   while (!result.empty()) {
     if (isFirst) {
