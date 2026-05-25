@@ -109,10 +109,21 @@ long long eval(long long a, long long b, const std::string &operation) {
     }
     return a - b;
   } else if (operation == "*") {
+    if (a != 0 && b != 0) {
+      if (a > std::numeric_limits<long long>::max() / b) {
+        throw std::overflow_error("overflow");
+      }
+      if (a < std::numeric_limits<long long>::min() / b) {
+        throw std::overflow_error("underflow");
+      }
+    }
     return a * b;
   } else if (operation == "/") {
     if (b == 0) {
       throw std::runtime_error("divide by 0");
+    }
+    if (a == std::numeric_limits<long long>::min() && b == -1) {
+      throw std::overflow_error("overflow");
     }
     return a / b;
   } else if (operation == "%") {
