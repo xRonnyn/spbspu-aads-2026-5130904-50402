@@ -94,7 +94,7 @@ karpenkov::Stack<queueExpr> inputCLI(std::istream &in) {
 long long eval(long long a, long long b, const std::string &operation) {
   if (operation == "+") {
     if (b > 0 && a > std::numeric_limits<long long>::max() - b) {
-      throw std::overflow_error("overflow");
+      throw std::overflow_error("Overflow");
     }
     if (b < 0 && a < std::numeric_limits<long long>::min() - b) {
       throw std::overflow_error("underflow");
