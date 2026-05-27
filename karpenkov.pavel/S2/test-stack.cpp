@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(pop_test) {
   BOOST_TEST(stack.top() == 1);
 }
 
-BOOST_AUTO_TEST_CASE(empty_test) {
+BOOST_AUTO_TEST_CASE(emptyStack_test) {
   karpenkov::Stack<int> stack;
 
   BOOST_TEST(stack.empty());
