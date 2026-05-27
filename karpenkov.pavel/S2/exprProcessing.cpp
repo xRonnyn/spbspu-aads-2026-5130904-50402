@@ -137,7 +137,7 @@ long long eval(long long a, long long b, const std::string &operation) {
 
     return result;
   }
-  throw std::runtime_error("unkown operation");
+  throw std::runtime_error("Unkown operation");
 }
 karpenkov::Stack<long long>
 calculateExpr(karpenkov::Stack<queueExpr> &postfixExpr) {
