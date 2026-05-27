@@ -10,7 +10,7 @@ bool isNumber(const std::string &element) { return std::isdigit(element[0]); }
 
 bool isValidOperator(const std::string &element) {
   if (element == "+" || element == "-" || element == "*" || element == "/" ||
-      element == "%") {
+      element == "%" || element == "**") {
     return true;
   }
   return false;
@@ -20,6 +20,8 @@ size_t priority(const std::string &operation) {
     return 1;
   } else if (operation == "/" || operation == "*" || operation == "%") {
     return 2;
+  } else if (operation == "**") {
+    return 3;
   }
   return 0;
 }
@@ -135,6 +137,12 @@ long long eval(long long a, long long b, const std::string &operation) {
       result += std::abs(b);
     }
 
+    return result;
+  } else if (operation == "**") {
+    long long result = 1;
+    for (long long i = 0; i < b; ++i) {
+      result *= a;
+    }
     return result;
   }
   throw std::runtime_error("Unkown operation");
