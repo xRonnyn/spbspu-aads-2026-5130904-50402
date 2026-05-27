@@ -61,3 +61,18 @@ BOOST_AUTO_TEST_CASE(invalid_expression_test) {
 
   BOOST_CHECK_THROW(calculateExpr(postfix), std::runtime_error);
 }
+BOOST_AUTO_TEST_CASE(power_operation) {
+  karpenkov::Stack<queueExpr> exprs;
+  queueExpr q;
+
+  q.push("2");
+  q.push("**");
+  q.push("3");
+
+  exprs.push(q);
+
+  auto postfix = toPostfix(exprs);
+  auto result = calculateExpr(postfix);
+
+  BOOST_TEST(result.top() == 8);
+}
