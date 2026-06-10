@@ -11,7 +11,7 @@ public:
   }
   void add(Key k, Value v) {
     size_t index = hash_(k) % capacity_;
-    for (size_t i = 0; i < capacity_; i++) {
+    for (size_t i = 0; i < capacity_; ++i) {
       size_t cur = (index + cur) % capacity_;
       if (table_[cur].state == EMPTY || table_[cur].state == TOMBSTONE) {
         table_[cur].key = k;
@@ -26,6 +26,18 @@ public:
       }
     }
     throw std::runtime_error("HashTable is full");
+  }
+  bool has(Key k) {
+    size_t index = hash_(k) % capacity_;
+    for (size_t i = 0; i < capacity_; ++i) {
+      size_t cur = (index + 1) % capacity_;
+      if (table_[cur].state == EMPTY) {
+        return false;
+      } else if (table_[cur].state == OCCUPIED && equal_(table_[cur].key, k)) {
+        return true;
+      }
+    }
+    return false;
   }
 
 private:
