@@ -1,18 +1,28 @@
+#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 #ifndef HASHTABLE_HPP
 #define HASHTABLE_HPP
 enum State { EMPTY, OCCUPIED, TOMBSTONE };
+template <class Key, class Value, class Hash, class Equal> class Iterator;
 template <class Key, class Value, class Hash, class Equal> class HashTable {
+  friend class Iterator<Key, Value, Hash, Equal>;
+
 public:
   HashTable(Hash hash, Equal equal)
       : size_(0), capacity_(10), hash_(hash), equal_(equal) {
     table_ = new Unit[capacity_];
   }
+  ~HashTable() { delete[] table_; }
+  struct Unit {
+    Key key;
+    Value value;
+    State state = EMPTY;
+  };
   void add(Key k, Value v) {
     size_t index = hash_(k) % capacity_;
     for (size_t i = 0; i < capacity_; ++i) {
-      size_t cur = (index + cur) % capacity_;
+      size_t cur = (index + i) % capacity_;
       if (table_[cur].state == EMPTY || table_[cur].state == TOMBSTONE) {
         table_[cur].key = k;
         table_[cur].value = v;
@@ -38,6 +48,19 @@ public:
       }
     }
     return false;
+  }
+  Value &at(Key k) {
+    size_t index = hash(k) % capacity_;
+    for (size_t i = 0; i < capacity_; ++i) {
+      size_t cur = (index + 1) % capacity_;
+      if (table_[cur].state == EMPTY) {
+        throw std::runtime_error("no element with such key");
+      }
+      if (equal_(table_[cur].key, k)) {
+        return table_[cur].value;
+      }
+    }
+    throw std::runtime_error("no element with such key");
   }
   Value drop(Key k) {
     size_t index = hash_(k) % capacity_;
@@ -72,16 +95,40 @@ public:
   }
 
 private:
-  struct Unit {
-    Key key;
-    Value value;
-    State state = EMPTY;
-  };
   Unit *table_;
   size_t size_;
   size_t capacity_;
   Hash hash_;
   Equal equal_;
+};
+template <class Key, class Value, class Hash, class Equal> class Iterator {
+  using Unit = typename HashTable<Key, Value, Hash, Equal>::Unit;
+
+public:
+  Iterator(Unit *start, Unit *end) : current_(start), end_(end) {
+    skip_invalid();
+  }
+  Iterator &operator++() {
+    ++current_;
+    skip_invalid();
+    return *this;
+  }
+  bool operator!=(const Iterator &other) const {
+    return current_ != other.current_;
+  }
+  bool operator==(const Iterator &other) const {
+    return current_ == other.current_;
+  }
+  Unit &operator*() { return *current_; }
+
+private:
+  void skip_invalid() {
+    while (current_ != end_ && current_->state != OCCUPIED) {
+      current_++;
+    }
+  }
+  Unit *current_;
+  Unit *end_;
 };
 
 #endif
