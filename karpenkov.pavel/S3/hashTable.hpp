@@ -19,6 +19,13 @@ public:
     Value value;
     State state = EMPTY;
   };
+  size_t size() const { return size_; }
+  Iterator<Key, Value, Hash, Equal> begin() {
+    return Iterator(table_, table_ + capacity_);
+  }
+  Iterator<Key, Value, Hash, Equal> end() {
+    return Iterator(table_ + capacity_, table_ + capacity_);
+  }
   void add(Key k, Value v) {
     size_t index = hash_(k) % capacity_;
     for (size_t i = 0; i < capacity_; ++i) {
@@ -31,7 +38,7 @@ public:
         return;
       }
       if (table_[cur].state == OCCUPIED && equal_(table_[cur].key, k)) {
-        table_[cur].key = k;
+        table_[cur].value = v;
         return;
       }
     }
@@ -40,7 +47,7 @@ public:
   bool has(Key k) {
     size_t index = hash_(k) % capacity_;
     for (size_t i = 0; i < capacity_; ++i) {
-      size_t cur = (index + 1) % capacity_;
+      size_t cur = (index + i) % capacity_;
       if (table_[cur].state == EMPTY) {
         return false;
       } else if (table_[cur].state == OCCUPIED && equal_(table_[cur].key, k)) {
@@ -50,7 +57,7 @@ public:
     return false;
   }
   Value &at(Key k) {
-    size_t index = hash(k) % capacity_;
+    size_t index = hash_(k) % capacity_;
     for (size_t i = 0; i < capacity_; ++i) {
       size_t cur = (index + 1) % capacity_;
       if (table_[cur].state == EMPTY) {
