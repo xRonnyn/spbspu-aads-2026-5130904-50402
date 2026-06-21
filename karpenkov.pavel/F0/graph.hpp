@@ -126,6 +126,37 @@ public:
       std::cout << (*i) << ' ';
     }
   }
+  void findCycles() {
+    HashTable<std::string, Color, StringHash, StringEqual> colors{
+        StringHash{}, StringEqual{}};
+    HashTable<std::string, std::string, StringHash, StringEqual> parent{
+        StringHash{}, StringEqual{}};
+    karpenkov::List<std::string> cycle;
+    using It = Iterator<std::string, karpenkov::List<std::string>, StringHash,
+                        StringEqual>;
+    for (It it = adj_.begin(); it != adj_.end(); ++it) {
+      colors.add((*it).key, WHITE);
+    }
+    for (It it = adj_.begin(); it != adj_.end(); ++it) {
+      const std::string &movie = (*it).key;
+      if (colors.at(movie) == WHITE) {
+        if (dfsCycle(movie, colors, parent, cycle)) {
+          for (karpenkov::LCIter<std::string> c = cycle.cbegin();
+               c != cycle.cend(); ++c) {
+            std::cout << *c;
+            karpenkov::LCIter<std::string> next = c;
+            ++next;
+            if (next != cycle.cend()) {
+              std::cout << " -> ";
+            }
+          }
+          std::cout << '\n';
+          return;
+        }
+      }
+    }
+    std::cout << "No cycles found\n";
+  }
 
 private:
   HashTable<std::string, karpenkov::List<std::string>, StringHash, StringEqual>
