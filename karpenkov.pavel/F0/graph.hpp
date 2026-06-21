@@ -17,6 +17,8 @@ struct StringEqual {
     return a == b;
   }
 };
+using AdjTable = HashTable<std::string, karpenkov::List<std::string>,
+                           StringHash, StringEqual>;
 class Graph {
 public:
   Graph()
@@ -103,7 +105,21 @@ public:
     HashTable<std::string, bool, StringHash, StringEqual> visit{StringHash{},
                                                                 StringEqual{}};
     karpenkov::List<std::string> result;
-    dfsDependencies(movie, visit, result);
+    dfs(movie, adj_, visit, result);
+    for (karpenkov::LCIter<std::string> i = result.cbegin(); i != result.cend();
+         ++i) {
+      std::cout << (*i) << ' ';
+    }
+  }
+  void showSuccessors(const std::string &movie) {
+    if (!reverse_.has(movie)) {
+      std::cerr << "error: movie not found\n";
+      return;
+    }
+    HashTable<std::string, bool, StringHash, StringEqual> visit{StringHash{},
+                                                                StringEqual{}};
+    karpenkov::List<std::string> result;
+    dfs(movie, reverse_, visit, result);
     for (karpenkov::LCIter<std::string> i = result.cbegin(); i != result.cend();
          ++i) {
       std::cout << (*i) << ' ';
@@ -115,10 +131,9 @@ private:
       adj_;
   HashTable<std::string, karpenkov::List<std::string>, StringHash, StringEqual>
       reverse_;
-  void dfsDependencies(
-      const std::string &movie,
-      HashTable<std::string, bool, StringHash, StringEqual> &visited,
-      karpenkov::List<std::string> &result) {
+  void dfs(const std::string &movie, AdjTable &graph,
+           HashTable<std::string, bool, StringHash, StringEqual> &visited,
+           karpenkov::List<std::string> &result) {
     if (!visited.has(movie)) {
       visited.add(movie, false);
     }
@@ -126,7 +141,7 @@ private:
       return;
     }
     visited.at(movie) = true;
-    karpenkov::List<std::string> &neighbors = adj_.at(movie);
+    karpenkov::List<std::string> &neighbors = graph.at(movie);
     for (karpenkov::LCIter<std::string> it = neighbors.cbegin();
          it != neighbors.cend(); ++it) {
       std::string next = *it;
@@ -135,7 +150,7 @@ private:
       }
       if (!visited.at(next)) {
         result.push_back(next);
-        dfsDependencies(next, visited, result);
+        dfs(next, graph, visited, result);
       }
     }
   }
