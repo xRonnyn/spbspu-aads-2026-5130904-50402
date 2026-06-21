@@ -68,7 +68,7 @@ public:
   bool empty() { return head == nullptr; }
   bool contains(const T &value) const {
     for (auto it = cbegin(); it != cend(); ++it) {
-      if (*it == true) {
+      if (*it == value) {
         return true;
       }
     }

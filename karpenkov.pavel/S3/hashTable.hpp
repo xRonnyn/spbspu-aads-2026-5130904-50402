@@ -21,10 +21,11 @@ public:
   };
   size_t size() const { return size_; }
   Iterator<Key, Value, Hash, Equal> begin() {
-    return Iterator(table_, table_ + capacity_);
+    return Iterator<Key, Value, Hash, Equal>(table_, table_ + capacity_);
   }
   Iterator<Key, Value, Hash, Equal> end() {
-    return Iterator(table_ + capacity_, table_ + capacity_);
+    return Iterator<Key, Value, Hash, Equal>(table_ + capacity_,
+                                             table_ + capacity_);
   }
   void add(Key k, Value v) {
     size_t index = hash_(k) % capacity_;
