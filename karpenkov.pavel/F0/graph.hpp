@@ -114,6 +114,20 @@ private:
       }
     }
   }
+  void showDependencies(const std::string &movie) {
+    if (!adj_.has(movie)) {
+      std::cerr << "error: movie not found\n";
+      return;
+    }
+    HashTable<std::string, bool, StringHash, StringEqual> visit{StringHash{},
+                                                                StringEqual{}};
+    karpenkov::List<std::string> result;
+    dfsDependencies(movie, visit, result);
+    for (karpenkov::LCIter<std::string> i = result.cbegin(); i != result.cend();
+         ++i) {
+      std::cout << (*i) << ' ';
+    }
+  }
 };
 } // namespace karpenkov
 #endif
