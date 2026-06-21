@@ -60,7 +60,7 @@ public:
   Value &at(Key k) {
     size_t index = hash_(k) % capacity_;
     for (size_t i = 0; i < capacity_; ++i) {
-      size_t cur = (index + 1) % capacity_;
+      size_t cur = (index + i) % capacity_;
       if (table_[cur].state == EMPTY) {
         throw std::runtime_error("no element with such key");
       }
@@ -73,7 +73,7 @@ public:
   Value drop(Key k) {
     size_t index = hash_(k) % capacity_;
     for (size_t i = 0; i < capacity_; ++i) {
-      size_t cur = (index + 1) % capacity_;
+      size_t cur = (index + i) % capacity_;
       if (table_[cur].state == OCCUPIED && equal_(table_[cur].key, k)) {
         table_[cur].state = TOMBSTONE;
         --size_;
