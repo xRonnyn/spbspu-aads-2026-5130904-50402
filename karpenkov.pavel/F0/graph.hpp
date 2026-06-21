@@ -6,6 +6,7 @@
 #include "../common/list.hpp"
 #include <iostream>
 namespace karpenkov {
+enum Color { WHITE, GRAY, BLACK };
 struct StringHash {
   size_t operator()(const std::string &s) const {
     return std::hash<std::string>{}(s);
@@ -153,6 +154,36 @@ private:
         dfs(next, graph, visited, result);
       }
     }
+  }
+  bool
+  dfsCycle(const std::string &movie,
+           HashTable<std::string, Color, StringHash, StringEqual> &colors,
+           HashTable<std::string, std::string, StringHash, StringEqual> &parent,
+           karpenkov::List<std::string> &cycle) {
+    colors.at(movie) = GRAY;
+    karpenkov::List<std::string> &neighbors = adj_.at(movie);
+    for (karpenkov::LCIter<std::string> i = neighbors.cbegin();
+         i != neighbors.cend(); ++i) {
+      std::string next = *i;
+      if (colors.at(next) == WHITE) {
+        parent.add(next, movie);
+        if (dfsCycle(next, colors, parent, cycle)) {
+          return true;
+        }
+      } else if (colors.at(next) == GRAY) {
+        cycle.push_front(next);
+        std::string cur = movie;
+        while (cur != next) {
+          cycle.push_front(cur);
+          cur = parent.at(cur);
+        }
+        cycle.push_back(next);
+        return true;
+      }
+    }
+
+    colors.at(movie) = BLACK;
+    return false;
   }
 };
 } // namespace karpenkov
