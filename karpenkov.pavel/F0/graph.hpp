@@ -90,6 +90,30 @@ public:
 private:
   HashTable<std::string, karpenkov::List<std::string>, StringHash, StringEqual>
       adj_;
+  void dfsDependencies(
+      const std::string &movie,
+      HashTable<std::string, bool, StringHash, StringEqual> &visited,
+      karpenkov::List<std::string> &result) {
+    if (!visited.has(movie)) {
+      visited.add(movie, false);
+    }
+    if (visited.at(movie)) {
+      return;
+    }
+    visited.at(movie) = true;
+    karpenkov::List<std::string> &neighbors = adj_.at(movie);
+    for (karpenkov::LCIter<std::string> it = neighbors.cbegin();
+         it != neighbors.cend(); ++it) {
+      std::string next = *it;
+      if (!visited.has(next)) {
+        visited.add(next, false);
+      }
+      if (!visited.at(next)) {
+        result.push_back(next);
+        dfsDependencies(next, visited, result);
+      }
+    }
+  }
 };
 } // namespace karpenkov
 #endif
