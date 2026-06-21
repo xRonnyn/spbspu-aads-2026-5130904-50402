@@ -19,7 +19,9 @@ struct StringEqual {
 };
 class Graph {
 public:
-  Graph();
+  Graph()
+      : adj_(StringHash{}, StringEqual{}),
+        reverse_(StringHash{}, StringEqual{}) {}
   void insertMovie(const std::string &A, const std::string &B) {
     if (!adj_.has(B)) {
       adj_.add(B, karpenkov::List<std::string>{});
@@ -32,6 +34,13 @@ public:
       return;
     }
     adj_.at(A).push_back(B);
+    if (!reverse_.has(A)) {
+      reverse_.add(A, karpenkov::List<std::string>{});
+    }
+    if (!reverse_.has(B)) {
+      reverse_.add(B, karpenkov::List<std::string>{});
+    }
+    reverse_.at(B).push_back(A);
   }
   void showOrder() {
     HashTable<std::string, size_t, StringHash, StringEqual> indegree(
@@ -86,10 +95,26 @@ public:
     }
     std::cout << "\n";
   }
+  void showDependencies(const std::string &movie) {
+    if (!adj_.has(movie)) {
+      std::cerr << "error: movie not found\n";
+      return;
+    }
+    HashTable<std::string, bool, StringHash, StringEqual> visit{StringHash{},
+                                                                StringEqual{}};
+    karpenkov::List<std::string> result;
+    dfsDependencies(movie, visit, result);
+    for (karpenkov::LCIter<std::string> i = result.cbegin(); i != result.cend();
+         ++i) {
+      std::cout << (*i) << ' ';
+    }
+  }
 
 private:
   HashTable<std::string, karpenkov::List<std::string>, StringHash, StringEqual>
       adj_;
+  HashTable<std::string, karpenkov::List<std::string>, StringHash, StringEqual>
+      reverse_;
   void dfsDependencies(
       const std::string &movie,
       HashTable<std::string, bool, StringHash, StringEqual> &visited,
@@ -112,20 +137,6 @@ private:
         result.push_back(next);
         dfsDependencies(next, visited, result);
       }
-    }
-  }
-  void showDependencies(const std::string &movie) {
-    if (!adj_.has(movie)) {
-      std::cerr << "error: movie not found\n";
-      return;
-    }
-    HashTable<std::string, bool, StringHash, StringEqual> visit{StringHash{},
-                                                                StringEqual{}};
-    karpenkov::List<std::string> result;
-    dfsDependencies(movie, visit, result);
-    for (karpenkov::LCIter<std::string> i = result.cbegin(); i != result.cend();
-         ++i) {
-      std::cout << (*i) << ' ';
     }
   }
 };
