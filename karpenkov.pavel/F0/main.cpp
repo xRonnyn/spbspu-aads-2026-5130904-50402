@@ -1,49 +1,35 @@
-#include "graph.hpp"
 #include <iostream>
-#include <string>
-using namespace karpenkov;
+#include <limits>
+
+#include "commands.hpp"
+
 int main() {
-  HashTable<std::string, Graph, StringHash, StringEqual> graphs(StringHash{},
-                                                                StringEqual{});
+  karpenkov::GraphManager manager;
+
+  using Cmd =
+      void (*)(std::istream &, std::ostream &, karpenkov::GraphManager &);
+
+  using CommandTable = HashTable<std::string, Cmd, karpenkov::StringHash,
+                                 karpenkov::StringEqual>;
+
+  CommandTable commands{karpenkov::StringHash{}, karpenkov::StringEqual{}};
+
+  commands.add("create-order", karpenkov::cmdCreateOrder);
+  commands.add("delete-order", karpenkov::cmdDeleteOrder);
+  commands.add("insert-movie", karpenkov::cmdInsertMovie);
+  commands.add("show-order", karpenkov::cmdShowOrder);
+  commands.add("show-dependencies", karpenkov::cmdShowDependencies);
+  commands.add("show-successors", karpenkov::cmdShowSuccessors);
+  commands.add("find-cycles", karpenkov::cmdFindCycles);
+
   std::string cmd;
   while (std::cin >> cmd) {
-    if (cmd == "create-order") {
-      std::string name;
-      std::cin >> name;
-      if (!graphs.has(name)) {
-        Graph g;
-        graphs.add(name, g);
-      }
-    } else if (cmd == "insert-movie") {
-      std::string graphName, a, b;
-      std::cin >> graphName >> a >> b;
-      if (!graphs.has(graphName)) {
-        std::cout << "Error: graph not found\n";
-        continue;
-      }
-      graphs.at(graphName).insertMovie(a, b);
-    } else if (cmd == "show-order") {
-      std::string graphName;
-      std::cin >> graphName;
-      graphs.at(graphName).showOrder();
-    } else if (cmd == "show-dependencies") {
-      std::string graphName, movie;
-      std::cin >> graphName >> movie;
-      graphs.at(graphName).showDependencies(movie);
-    } else if (cmd == "show-successors") {
-      std::string graphName, movie;
-      std::cin >> graphName >> movie;
-      graphs.at(graphName).showSuccessors(movie);
-    } else if (cmd == "find-cycles") {
-      std::string graphName;
-      std::cin >> graphName;
-
-      graphs.at(graphName).findCycles();
-    } else if (cmd == "exit") {
-      break;
-    } else {
-      std::cout << "Unknown command\n";
+    try {
+      commands.at(cmd)(std::cin, std::cout, manager);
+    } catch (const std::exception &) {
+      std::cout << "<INVALID COMMAND>\n";
+      std::cin.clear();
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
   }
-  return 0;
 }
