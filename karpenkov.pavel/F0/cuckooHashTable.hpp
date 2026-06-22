@@ -190,5 +190,22 @@ void CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::rehash(
   delete[] old_table1;
   delete[] old_table2;
 }
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+Value CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::drop(const Key &key) {
+  size_t i1 = index1(key);
+
+  if (table1_[i1].occupied && equal_(table1_[i1].key, key)) {
+    table1_[i1].occupied = false;
+    --size_;
+    return table1_[i1].value;
+  }
+  size_t i2 = index2(key);
+  if (table2_[i2].occupied && equal_(table2_[i2].key, key)) {
+    table2_[i2].occupied = false;
+    --size_;
+    return table2_[i2].value;
+  }
+  throw std::runtime_error("key not found");
+}
 
 #endif
