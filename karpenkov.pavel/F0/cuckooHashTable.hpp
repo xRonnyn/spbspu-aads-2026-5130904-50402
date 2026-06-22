@@ -63,6 +63,19 @@ private:
   Equal equal_;
 };
 template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooIterator<Key, Value, Hash1, Hash2, Equal>
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::begin() {
+  return CuckooIterator<Key, Value, Hash1, Hash2, Equal>(table1_, table2_,
+                                                         capacity_, 0);
+}
+
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooIterator<Key, Value, Hash1, Hash2, Equal>
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::end() {
+  return CuckooIterator<Key, Value, Hash1, Hash2, Equal>(
+      table1_, table2_, capacity_, 2 * capacity_);
+}
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
 CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::CuckooHashTable(Hash1 hash1,
                                                                   Hash2 hash2,
                                                                   Equal equal)
