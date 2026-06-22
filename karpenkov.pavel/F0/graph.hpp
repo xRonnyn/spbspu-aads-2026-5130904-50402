@@ -2,14 +2,23 @@
 #define GRAPH_HPP
 
 #include "../S2/queue.hpp"
-#include "../S3/hashTable.hpp"
 #include "../common/list.hpp"
+#include "cuckooHashTable.hpp"
 #include <iostream>
 namespace karpenkov {
 enum Color { WHITE, GRAY, BLACK };
-struct StringHash {
+struct StringHash1 {
   size_t operator()(const std::string &s) const {
     return std::hash<std::string>{}(s);
+  }
+};
+struct StringHash2 {
+  size_t operator()(const std::string &str) const {
+    size_t hash = 0;
+    for (char c : str) {
+      hash = hash * 37 + c;
+    }
+    return hash;
   }
 };
 
@@ -18,13 +27,13 @@ struct StringEqual {
     return a == b;
   }
 };
-using AdjTable = HashTable<std::string, karpenkov::List<std::string>,
-                           StringHash, StringEqual>;
+using AdjTable = CuckooHashTable<std::string, karpenkov::List<std::string>,
+                                 StringHash1, StringHash2, StringEqual>;
 class Graph {
 public:
   Graph()
-      : adj_(StringHash{}, StringEqual{}),
-        reverse_(StringHash{}, StringEqual{}) {}
+      : adj_(StringHash1{}, StringHash2{}, StringEqual{}),
+        reverse_(StringHash1{}, StringHash2{}, StringEqual{}) {}
   void insertMovie(const std::string &A, const std::string &B) {
     if (!adj_.has(B)) {
       adj_.add(B, karpenkov::List<std::string>{});
@@ -46,10 +55,10 @@ public:
     reverse_.at(B).push_back(A);
   }
   void showOrder(std::ostream &out) {
-    HashTable<std::string, size_t, StringHash, StringEqual> indegree(
-        StringHash{}, StringEqual{});
-    using itHash = Iterator<std::string, karpenkov::List<std::string>,
-                            StringHash, StringEqual>;
+    CuckooHashTable<std::string, size_t, StringHash1, StringHash2, StringEqual>
+        indegree(StringHash1{}, StringHash2{}, StringEqual{});
+    using itHash = CuckooIterator<std::string, karpenkov::List<std::string>,
+                                  StringHash1, StringHash2, StringEqual>;
     for (itHash it = adj_.begin(); it != adj_.end(); ++it) {
       indegree.add((*it).key, 0);
     }
@@ -103,8 +112,8 @@ public:
       std::cerr << "error: movie not found\n";
       return;
     }
-    HashTable<std::string, bool, StringHash, StringEqual> visit{StringHash{},
-                                                                StringEqual{}};
+    CuckooHashTable<std::string, bool, StringHash1, StringHash2, StringEqual>
+        visit{StringHash1{}, StringHash2{}, StringEqual{}};
     karpenkov::List<std::string> result;
     dfs(movie, adj_, visit, result);
     for (karpenkov::LCIter<std::string> i = result.cbegin(); i != result.cend();
@@ -117,8 +126,8 @@ public:
       std::cerr << "error: movie not found\n";
       return;
     }
-    HashTable<std::string, bool, StringHash, StringEqual> visit{StringHash{},
-                                                                StringEqual{}};
+    CuckooHashTable<std::string, bool, StringHash1, StringHash2, StringEqual>
+        visit{StringHash1{}, StringHash2{}, StringEqual{}};
     karpenkov::List<std::string> result;
     dfs(movie, reverse_, visit, result);
     for (karpenkov::LCIter<std::string> i = result.cbegin(); i != result.cend();
@@ -127,13 +136,14 @@ public:
     }
   }
   void findCycles(std::ostream &out) {
-    HashTable<std::string, Color, StringHash, StringEqual> colors{
-        StringHash{}, StringEqual{}};
-    HashTable<std::string, std::string, StringHash, StringEqual> parent{
-        StringHash{}, StringEqual{}};
+    CuckooHashTable<std::string, Color, StringHash1, StringHash2, StringEqual>
+        colors{StringHash1{}, StringHash2{}, StringEqual{}};
+    CuckooHashTable<std::string, std::string, StringHash1, StringHash2,
+                    StringEqual>
+        parent{StringHash1{}, StringHash2{}, StringEqual{}};
     karpenkov::List<std::string> cycle;
-    using It = Iterator<std::string, karpenkov::List<std::string>, StringHash,
-                        StringEqual>;
+    using It = CuckooIterator<std::string, karpenkov::List<std::string>,
+                              StringHash1, StringHash2, StringEqual>;
     for (It it = adj_.begin(); it != adj_.end(); ++it) {
       colors.add((*it).key, WHITE);
     }
@@ -159,12 +169,15 @@ public:
   }
 
 private:
-  HashTable<std::string, karpenkov::List<std::string>, StringHash, StringEqual>
+  CuckooHashTable<std::string, karpenkov::List<std::string>, StringHash1,
+                  StringHash2, StringEqual>
       adj_;
-  HashTable<std::string, karpenkov::List<std::string>, StringHash, StringEqual>
+  CuckooHashTable<std::string, karpenkov::List<std::string>, StringHash1,
+                  StringHash2, StringEqual>
       reverse_;
   void dfs(const std::string &movie, AdjTable &graph,
-           HashTable<std::string, bool, StringHash, StringEqual> &visited,
+           CuckooHashTable<std::string, bool, StringHash1, StringHash2,
+                           StringEqual> &visited,
            karpenkov::List<std::string> &result) {
     if (!visited.has(movie)) {
       visited.add(movie, false);
@@ -186,11 +199,12 @@ private:
       }
     }
   }
-  bool
-  dfsCycle(const std::string &movie,
-           HashTable<std::string, Color, StringHash, StringEqual> &colors,
-           HashTable<std::string, std::string, StringHash, StringEqual> &parent,
-           karpenkov::List<std::string> &cycle) {
+  bool dfsCycle(const std::string &movie,
+                CuckooHashTable<std::string, Color, StringHash1, StringHash2,
+                                StringEqual> &colors,
+                CuckooHashTable<std::string, std::string, StringHash1,
+                                StringHash2, StringEqual> &parent,
+                karpenkov::List<std::string> &cycle) {
     colors.at(movie) = GRAY;
     karpenkov::List<std::string> &neighbors = adj_.at(movie);
     for (karpenkov::LCIter<std::string> i = neighbors.cbegin();

@@ -1,6 +1,6 @@
 #ifndef GRAPHMANAGER_HPP
 #define GRAPHMANAGER_HPP
-#include "../S3/hashTable.hpp"
+#include "cuckooHashTable.hpp"
 #include "graph.hpp"
 
 namespace karpenkov {
@@ -14,8 +14,8 @@ public:
   bool hasOrder(const std::string &name);
 
 private:
-  HashTable<std::string, Graph, StringHash, StringEqual> orders_{StringHash{},
-                                                                 StringEqual{}};
+  CuckooHashTable<std::string, Graph, StringHash1, StringHash2, StringEqual>
+      orders_{StringHash1{}, StringHash2{}, StringEqual{}};
 };
 } // namespace karpenkov
 

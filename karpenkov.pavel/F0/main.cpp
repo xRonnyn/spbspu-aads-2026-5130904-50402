@@ -2,6 +2,7 @@
 #include <limits>
 
 #include "commands.hpp"
+#include "graph.hpp"
 
 int main() {
   karpenkov::GraphManager manager;
@@ -9,10 +10,12 @@ int main() {
   using Cmd =
       void (*)(std::istream &, std::ostream &, karpenkov::GraphManager &);
 
-  using CommandTable = HashTable<std::string, Cmd, karpenkov::StringHash,
-                                 karpenkov::StringEqual>;
+  using CommandTable =
+      CuckooHashTable<std::string, Cmd, karpenkov::StringHash1,
+                      karpenkov::StringHash2, karpenkov::StringEqual>;
 
-  CommandTable commands{karpenkov::StringHash{}, karpenkov::StringEqual{}};
+  CommandTable commands{karpenkov::StringHash1{}, karpenkov::StringHash2{},
+                        karpenkov::StringEqual{}};
 
   commands.add("create-order", karpenkov::cmdCreateOrder);
   commands.add("delete-order", karpenkov::cmdDeleteOrder);

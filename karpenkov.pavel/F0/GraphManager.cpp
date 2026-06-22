@@ -19,7 +19,8 @@ bool karpenkov::GraphManager::hasOrder(const std::string &name) {
 }
 
 void karpenkov::GraphManager::listOrders(std::ostream &out) {
-  using Iter = Iterator<std::string, Graph, StringHash, StringEqual>;
+  using Iter =
+      CuckooIterator<std::string, Graph, StringHash1, StringHash2, StringEqual>;
   for (Iter it = orders_.begin(); it != orders_.end(); ++it) {
     out << (*it).key << '\n';
   }
