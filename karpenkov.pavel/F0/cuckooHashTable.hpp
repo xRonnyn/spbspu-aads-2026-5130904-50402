@@ -125,5 +125,70 @@ Value &CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::at(const Key &key) {
 
   throw std::runtime_error("no element with such key");
 }
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+void CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::add(const Key &key,
+                                                           const Value &value) {
+  if (has(key)) {
+    at(key) = value;
+    return;
+  }
+
+  Unit current;
+  current.key = key;
+  current.value = value;
+  current.occupied = true;
+
+  bool first = true;
+
+  for (size_t kick = 0; kick < MAX_KICKS; ++kick) {
+    if (first) {
+      size_t index = index1(current.key);
+
+      if (!table1_[index].occupied) {
+        table1_[index] = current;
+        ++size_;
+        return;
+      }
+      std::swap(current, table1_[index]);
+    } else {
+      size_t index = index2(current.key);
+
+      if (!table2_[index].occupied) {
+        table2_[index] = current;
+        ++size_;
+        return;
+      }
+      std::swap(current, table2_[index]);
+    }
+    first = !first;
+  }
+
+  rehash(capacity_ * 2);
+  add(current.key, current.value);
+}
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+void CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::rehash(
+    size_t new_capacity) {
+  Unit *old_table1 = table1_;
+  Unit *old_table2 = table2_;
+  size_t old_capacity = capacity_;
+
+  capacity_ = new_capacity;
+  size_ = 0;
+
+  table1_ = new Unit[capacity_];
+  table2_ = new Unit[capacity_];
+
+  for (size_t i = 0; i < old_capacity; ++i) {
+    if (old_table1[i].occupied) {
+      add(old_table1[i].key, old_table1[i].value);
+    }
+    if (old_table2[i].occupied) {
+      add(old_table2[i].key, old_table2[i].value);
+    }
+  }
+  delete[] old_table1;
+  delete[] old_table2;
+}
 
 #endif
