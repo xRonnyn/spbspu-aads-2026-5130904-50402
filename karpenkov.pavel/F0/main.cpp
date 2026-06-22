@@ -21,6 +21,7 @@ int main() {
   commands.add("show-dependencies", karpenkov::cmdShowDependencies);
   commands.add("show-successors", karpenkov::cmdShowSuccessors);
   commands.add("find-cycles", karpenkov::cmdFindCycles);
+  commands.add("list-orders", karpenkov::cmdListOrders);
 
   std::string cmd;
   while (std::cin >> cmd) {

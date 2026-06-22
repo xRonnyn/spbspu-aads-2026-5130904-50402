@@ -54,4 +54,7 @@ void cmdFindCycles(std::istream &in, std::ostream &out, GraphManager &manager) {
   in >> order;
   manager.getOrder(order).findCycles(out);
 }
+void cmdListOrders(std::istream &, std::ostream &out, GraphManager &manager) {
+  manager.listOrders(out);
+}
 } // namespace karpenkov

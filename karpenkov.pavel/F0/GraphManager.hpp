@@ -10,6 +10,8 @@ public:
   void deleteOrder(const std::string &name);
 
   Graph &getOrder(const std::string &name);
+  void listOrders(std::ostream &out);
+  bool hasOrder(const std::string &name);
 
 private:
   HashTable<std::string, Graph, StringHash, StringEqual> orders_{StringHash{},
