@@ -207,5 +207,73 @@ Value CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::drop(const Key &key) {
   }
   throw std::runtime_error("key not found");
 }
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::CuckooHashTable(
+    const CuckooHashTable &other)
+    : table1_(new Unit[other.capacity_]), table2_(new Unit[other.capacity_]),
+      capacity_(other.capacity_), size_(other.size_), hash1_(other.hash1_),
+      hash2_(other.hash2_), equal_(other.equal_) {
+  for (size_t i = 0; i < capacity_; ++i) {
+    table1_[i] = other.table1_[i];
+    table2_[i] = other.table2_[i];
+  }
+}
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+void CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::swap(
+    CuckooHashTable &other) noexcept {
+  std::swap(table1_, other.table1_);
+  std::swap(table2_, other.table2_);
+  std::swap(capacity_, other.capacity_);
+  std::swap(size_, other.size_);
+  std::swap(hash1_, other.hash1_);
+  std::swap(hash2_, other.hash2_);
+  std::swap(equal_, other.equal_);
+}
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal> &
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::operator=(
+    const CuckooHashTable &other) {
+  if (this != &other) {
+    CuckooHashTable temp(other);
+    swap(temp);
+  }
+  return *this;
+}
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::CuckooHashTable(
+    CuckooHashTable &&other) noexcept
+    : table1_(other.table1_), table2_(other.table2_),
+      capacity_(other.capacity_), size_(other.size_),
+      hash1_(std::move(other.hash1_)), hash2_(std::move(other.hash2_)),
+      equal_(std::move(other.equal_)) {
+  other.table1_ = nullptr;
+  other.table2_ = nullptr;
+  other.capacity_ = 0;
+  other.size_ = 0;
+}
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal> &
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::operator=(
+    CuckooHashTable &&other) noexcept {
+  if (this != &other) {
+    delete[] table1_;
+    delete[] table2_;
+
+    table1_ = other.table1_;
+    table2_ = other.table2_;
+    capacity_ = other.capacity_;
+    size_ = other.size_;
+
+    hash1_ = std::move(other.hash1_);
+    hash2_ = std::move(other.hash2_);
+    equal_ = std::move(other.equal_);
+
+    other.table1_ = nullptr;
+    other.table2_ = nullptr;
+    other.capacity_ = 0;
+    other.size_ = 0;
+  }
+  return *this;
+}
 
 #endif
