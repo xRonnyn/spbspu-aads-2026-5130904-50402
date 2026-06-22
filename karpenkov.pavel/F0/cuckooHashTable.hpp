@@ -76,5 +76,21 @@ CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::~CuckooHashTable() {
   delete[] table1_;
   delete[] table2_;
 }
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+size_t CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::size() const {
+  return size_;
+}
+
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+size_t
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::index1(const Key &key) const {
+  return hash1_(key) % capacity_;
+}
+
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+size_t
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::index2(const Key &key) const {
+  return hash2_(key) % capacity_;
+}
 
 #endif
