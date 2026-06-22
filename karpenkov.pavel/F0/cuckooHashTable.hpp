@@ -109,5 +109,21 @@ bool CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::has(
 
   return false;
 }
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+Value &CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::at(const Key &key) {
+  size_t i1 = index1(key);
+
+  if (table1_[i1].occupied && equal_(table1_[i1].key, key)) {
+    return table1_[i1].value;
+  }
+
+  size_t i2 = index2(key);
+
+  if (table2_[i2].occupied && equal_(table2_[i2].key, key)) {
+    return table2_[i2].value;
+  }
+
+  throw std::runtime_error("no element with such key");
+}
 
 #endif
