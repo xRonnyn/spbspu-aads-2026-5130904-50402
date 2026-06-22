@@ -45,7 +45,7 @@ public:
     }
     reverse_.at(B).push_back(A);
   }
-  void showOrder() {
+  void showOrder(std::ostream &out) {
     HashTable<std::string, size_t, StringHash, StringEqual> indegree(
         StringHash{}, StringEqual{});
     using itHash = Iterator<std::string, karpenkov::List<std::string>,
@@ -85,20 +85,20 @@ public:
       ++count;
     }
     if (count != adj_.size()) {
-      std::cout << "Error: cycle detected\n";
+      out << "Error: cycle detected\n";
       return;
     }
     for (LCIter<std::string> it = result.cbegin(); it != result.cend(); ++it) {
-      std::cout << *it;
+      out << *it;
       LCIter<std::string> next = it;
       ++next;
       if (next != result.cend()) {
-        std::cout << " -> ";
+        out << " -> ";
       }
     }
-    std::cout << "\n";
+    out << "\n";
   }
-  void showDependencies(const std::string &movie) {
+  void showDependencies(const std::string &movie, std::ostream &out) {
     if (!adj_.has(movie)) {
       std::cerr << "error: movie not found\n";
       return;
@@ -109,10 +109,10 @@ public:
     dfs(movie, adj_, visit, result);
     for (karpenkov::LCIter<std::string> i = result.cbegin(); i != result.cend();
          ++i) {
-      std::cout << (*i) << ' ';
+      out << (*i) << ' ';
     }
   }
-  void showSuccessors(const std::string &movie) {
+  void showSuccessors(const std::string &movie, std::ostream &out) {
     if (!reverse_.has(movie)) {
       std::cerr << "error: movie not found\n";
       return;
@@ -123,10 +123,10 @@ public:
     dfs(movie, reverse_, visit, result);
     for (karpenkov::LCIter<std::string> i = result.cbegin(); i != result.cend();
          ++i) {
-      std::cout << (*i) << ' ';
+      out << (*i) << ' ';
     }
   }
-  void findCycles() {
+  void findCycles(std::ostream &out) {
     HashTable<std::string, Color, StringHash, StringEqual> colors{
         StringHash{}, StringEqual{}};
     HashTable<std::string, std::string, StringHash, StringEqual> parent{
@@ -143,19 +143,19 @@ public:
         if (dfsCycle(movie, colors, parent, cycle)) {
           for (karpenkov::LCIter<std::string> c = cycle.cbegin();
                c != cycle.cend(); ++c) {
-            std::cout << *c;
+            out << *c;
             karpenkov::LCIter<std::string> next = c;
             ++next;
             if (next != cycle.cend()) {
-              std::cout << " -> ";
+              out << " -> ";
             }
           }
-          std::cout << '\n';
+          out << '\n';
           return;
         }
       }
     }
-    std::cout << "No cycles found\n";
+    out << "No cycles found\n";
   }
 
 private:

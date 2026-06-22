@@ -30,7 +30,7 @@ void cmdInsertMovie(std::istream &in, std::ostream &out,
 void cmdShowOrder(std::istream &in, std::ostream &out, GraphManager &manager) {
   std::string order;
   in >> order;
-  manager.getOrder(order).showOrder();
+  manager.getOrder(order).showOrder(out);
 }
 
 void cmdShowDependencies(std::istream &in, std::ostream &out,
@@ -38,7 +38,7 @@ void cmdShowDependencies(std::istream &in, std::ostream &out,
   std::string order;
   std::string movie;
   in >> order >> movie;
-  manager.getOrder(order).showDependencies(movie);
+  manager.getOrder(order).showDependencies(movie, out);
 }
 
 void cmdShowSuccessors(std::istream &in, std::ostream &out,
@@ -46,12 +46,12 @@ void cmdShowSuccessors(std::istream &in, std::ostream &out,
   std::string order;
   std::string movie;
   in >> order >> movie;
-  manager.getOrder(order).showSuccessors(movie);
+  manager.getOrder(order).showSuccessors(movie, out);
 }
 
 void cmdFindCycles(std::istream &in, std::ostream &out, GraphManager &manager) {
   std::string order;
   in >> order;
-  manager.getOrder(order).findCycles();
+  manager.getOrder(order).findCycles(out);
 }
 } // namespace karpenkov
