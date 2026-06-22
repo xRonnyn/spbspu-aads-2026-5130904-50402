@@ -298,5 +298,29 @@ private:
   size_t capacity_;
   size_t index_;
 };
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooIterator<Key, Value, Hash1, Hash2, Equal>::CuckooIterator(Unit *table1,
+                                                                Unit *table2,
+                                                                size_t capacity,
+                                                                size_t index)
+    : table1_(table1), table2_(table2), capacity_(capacity), index_(index) {
+  skip_invalid();
+}
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+void CuckooIterator<Key, Value, Hash1, Hash2, Equal>::skip_invalid() {
+  while (index_ < 2 * capacity_) {
+    Unit *current;
+
+    if (index_ < capacity_) {
+      current = &table1_[index_];
+    } else {
+      current = &table2_[index_ - capacity_];
+    }
+    if (current->occupied) {
+      return;
+    }
+    ++index_;
+  }
+}
 
 #endif
