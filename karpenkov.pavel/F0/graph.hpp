@@ -198,9 +198,8 @@ private:
       std::string next = *i;
       if (colors.at(next) == WHITE) {
         parent.add(next, movie);
-        if (dfsCycle(next, colors, parent, cycle)) {
+        if (dfsCycle(next, colors, parent, cycle))
           return true;
-        }
       } else if (colors.at(next) == GRAY) {
         cycle.push_front(next);
         std::string cur = movie;
@@ -208,11 +207,10 @@ private:
           cycle.push_front(cur);
           cur = parent.at(cur);
         }
-        cycle.push_back(next);
+        cycle.push_front(next);
         return true;
       }
     }
-
     colors.at(movie) = BLACK;
     return false;
   }
