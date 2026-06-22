@@ -275,5 +275,28 @@ CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::operator=(
   }
   return *this;
 }
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+class CuckooIterator {
+  using Unit = typename CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::Unit;
+
+public:
+  CuckooIterator(Unit *table1, Unit *table2, size_t capacity, size_t index);
+
+  CuckooIterator &operator++();
+
+  bool operator==(const CuckooIterator &other) const;
+  bool operator!=(const CuckooIterator &other) const;
+
+  Unit &operator*();
+
+private:
+  void skip_invalid();
+
+  Unit *table1_;
+  Unit *table2_;
+
+  size_t capacity_;
+  size_t index_;
+};
 
 #endif
