@@ -322,5 +322,32 @@ void CuckooIterator<Key, Value, Hash1, Hash2, Equal>::skip_invalid() {
     ++index_;
   }
 }
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooIterator<Key, Value, Hash1, Hash2, Equal> &
+CuckooIterator<Key, Value, Hash1, Hash2, Equal>::operator++() {
+  ++index_;
+  skip_invalid();
+  return *this;
+}
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+bool CuckooIterator<Key, Value, Hash1, Hash2, Equal>::operator==(
+    const CuckooIterator &other) const {
+  return index_ == other.index_;
+}
+
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+bool CuckooIterator<Key, Value, Hash1, Hash2, Equal>::operator!=(
+    const CuckooIterator &other) const {
+  return !(*this == other);
+}
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+typename CuckooIterator<Key, Value, Hash1, Hash2, Equal>::Unit &
+CuckooIterator<Key, Value, Hash1, Hash2, Equal>::operator*() {
+  if (index_ < capacity_) {
+    return table1_[index_];
+  }
+
+  return table2_[index_ - capacity_];
+}
 
 #endif
