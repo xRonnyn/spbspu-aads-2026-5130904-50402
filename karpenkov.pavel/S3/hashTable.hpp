@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <stdexcept>
+#include <utility>
 #ifndef HASHTABLE_HPP
 #define HASHTABLE_HPP
 enum State { EMPTY, OCCUPIED, TOMBSTONE };
@@ -12,6 +13,52 @@ public:
   HashTable(Hash hash, Equal equal)
       : size_(0), capacity_(10), hash_(hash), equal_(equal) {
     table_ = new Unit[capacity_];
+  }
+  HashTable(const HashTable &other)
+      : size_(other.size_), capacity_(other.capacity_), hash_(other.hash_),
+        equal_(other.equal_) {
+    table_ = new Unit[capacity_];
+    for (size_t i = 0; i < capacity_; ++i) {
+      table_[i] = other.table_[i];
+    }
+  }
+  HashTable &operator=(const HashTable &other) {
+    if (this == &other) {
+      return *this;
+    }
+    Unit *new_table = new Unit[other.capacity_];
+    for (size_t i = 0; i < other.capacity_; ++i) {
+      new_table[i] = other.table_[i];
+    }
+    delete[] table_;
+    table_ = new_table;
+    size_ = other.size_;
+    capacity_ = other.capacity_;
+    hash_ = other.hash_;
+    equal_ = other.equal_;
+    return *this;
+  }
+  HashTable(HashTable &&other) noexcept
+      : table_(other.table_), size_(other.size_), capacity_(other.capacity_),
+        hash_(std::move(other.hash_)), equal_(std::move(other.equal_)) {
+    other.table_ = nullptr;
+    other.size_ = 0;
+    other.capacity_ = 0;
+  }
+  HashTable &operator=(HashTable &&other) noexcept {
+    if (this == &other) {
+      return *this;
+    }
+    delete[] table_;
+    table_ = other.table_;
+    size_ = other.size_;
+    capacity_ = other.capacity_;
+    hash_ = std::move(other.hash_);
+    equal_ = std::move(other.equal_);
+    other.table_ = nullptr;
+    other.size_ = 0;
+    other.capacity_ = 0;
+    return *this;
   }
   ~HashTable() { delete[] table_; }
   struct Unit {
