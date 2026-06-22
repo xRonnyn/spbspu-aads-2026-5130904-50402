@@ -16,6 +16,7 @@ void cmdShowSuccessors(std::istream &, std::ostream &, GraphManager &);
 
 void cmdFindCycles(std::istream &, std::ostream &, GraphManager &);
 void cmdListOrders(std::istream &, std::ostream &, GraphManager &);
+void cmdHelp(std::istream &, std::ostream &, GraphManager &);
 } // namespace karpenkov
 
 #endif

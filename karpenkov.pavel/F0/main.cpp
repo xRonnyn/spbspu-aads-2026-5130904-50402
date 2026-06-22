@@ -17,6 +17,7 @@ int main() {
   CommandTable commands{karpenkov::StringHash1{}, karpenkov::StringHash2{},
                         karpenkov::StringEqual{}};
 
+  commands.add("help", karpenkov::cmdHelp);
   commands.add("create-order", karpenkov::cmdCreateOrder);
   commands.add("delete-order", karpenkov::cmdDeleteOrder);
   commands.add("insert-movie", karpenkov::cmdInsertMovie);
@@ -25,6 +26,8 @@ int main() {
   commands.add("show-successors", karpenkov::cmdShowSuccessors);
   commands.add("find-cycles", karpenkov::cmdFindCycles);
   commands.add("list-orders", karpenkov::cmdListOrders);
+  karpenkov::cmdHelp(std::cin, std::cout, manager);
+  std::cout << '\n';
 
   std::string cmd;
   while (std::cin >> cmd) {

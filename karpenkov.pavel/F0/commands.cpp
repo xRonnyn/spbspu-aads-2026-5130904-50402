@@ -57,4 +57,16 @@ void cmdFindCycles(std::istream &in, std::ostream &out, GraphManager &manager) {
 void cmdListOrders(std::istream &, std::ostream &out, GraphManager &manager) {
   manager.listOrders(out);
 }
+void cmdHelp(std::istream &, std::ostream &out, GraphManager &) {
+  out << "Available commands:\n";
+  out << "  help\n";
+  out << "  create-order <graph>\n";
+  out << "  delete-order <graph>\n";
+  out << "  list-orders\n";
+  out << "  insert-movie <graph> <movie> <dependency>\n";
+  out << "  show-order <graph>\n";
+  out << "  show-dependencies <graph> <movie>\n";
+  out << "  show-successors <graph> <movie>\n";
+  out << "  find-cycles <graph>\n";
+}
 } // namespace karpenkov
