@@ -62,5 +62,19 @@ private:
   Hash2 hash2_;
   Equal equal_;
 };
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::CuckooHashTable(Hash1 hash1,
+                                                                  Hash2 hash2,
+                                                                  Equal equal)
+    : capacity_(10), size_(0), hash1_(hash1), hash2_(hash2), equal_(equal) {
+  table1_ = new Unit[capacity_];
+  table2_ = new Unit[capacity_];
+}
+
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::~CuckooHashTable() {
+  delete[] table1_;
+  delete[] table2_;
+}
 
 #endif
