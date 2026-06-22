@@ -92,5 +92,22 @@ size_t
 CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::index2(const Key &key) const {
   return hash2_(key) % capacity_;
 }
+template <class Key, class Value, class Hash1, class Hash2, class Equal>
+bool CuckooHashTable<Key, Value, Hash1, Hash2, Equal>::has(
+    const Key &key) const {
+  size_t i1 = index1(key);
+
+  if (table1_[i1].occupied && equal_(table1_[i1].key, key)) {
+    return true;
+  }
+
+  size_t i2 = index2(key);
+
+  if (table2_[i2].occupied && equal_(table2_[i2].key, key)) {
+    return true;
+  }
+
+  return false;
+}
 
 #endif
